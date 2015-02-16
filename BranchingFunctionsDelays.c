@@ -32,6 +32,17 @@ void EnableInterrupts(void);  // Enable interrupts
 int main(void){ unsigned long volatile delay;
   TExaS_Init(SW_PIN_PF4, LED_PIN_PF2);  // activate grader and set system clock to 80 MHz
   // initialization goes here
+	//Port F setup
+	GPIO_PORTF_AMSEL_R &= ~0x14;
+	GPIO_PORTF_PCTL_R &= ~0x14;
+	GPIO_PORTF_DIR_R = (GPIO_PORTF_DIR_R&(~0x10))|0x04;
+	GPIO_PORTF_AFSEL_R &= !0x14;
+	GPIO_PORTF_DEN_R |= 0x14;
+	GPIO_PORTF_PUR_R |= 0x10;
+	GPIO_PORTF_DATA_R |= 0x04; //Have blue LED start initially
+	
+	
+	
 
   EnableInterrupts();           // enable interrupts for the grader
   while(1){
