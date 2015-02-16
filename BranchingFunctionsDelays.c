@@ -24,15 +24,39 @@
 #define GPIO_PORTF_PCTL_R       (*((volatile unsigned long *)0x4002552C))
 #define SYSCTL_RCGC2_R          (*((volatile unsigned long *)0x400FE108))
 #define SYSCTL_RCGC2_GPIOF      0x00000020  // port F Clock Gating Control
+// Port F Address: 0x40025000
+// Set bit-specific addresses for PF0-PF4
+#define PF0											(*((volatile unsigned long *)0x40025004))
+#define PF1											(*((volatile unsigned long *)0x40025008))
+#define PF2											(*((volatile unsigned long *)0x40025010))
+#define PF3											(*((volatile unsigned long *)0x40025020))
+#define PF4											(*((volatile unsigned long *)0x40025040))
+
 
 // basic functions defined at end of startup.s
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
 
+void Delay100ms(unsigned long time){
+  unsigned long i;
+  while(time > 0){
+    i = 1333333;  // this number means 100ms
+    while(i > 0){
+      i = i - 1;
+    }
+    time = time - 1; // decrements every 100 ms
+  }
+}
+
 int main(void){ unsigned long volatile delay;
   TExaS_Init(SW_PIN_PF4, LED_PIN_PF2);  // activate grader and set system clock to 80 MHz
   // initialization goes here
+
 	//Port F setup
+	SYSCTL_RCGC2_R |= 0x00000020;     // activate clock for Port F
+	//Delay 100ms -> Must come right after clock activation
+	Delay100ms(1);
+
 	GPIO_PORTF_AMSEL_R &= ~0x14;
 	GPIO_PORTF_PCTL_R &= ~0x14;
 	GPIO_PORTF_DIR_R = (GPIO_PORTF_DIR_R&(~0x10))|0x04;
@@ -40,12 +64,17 @@ int main(void){ unsigned long volatile delay;
 	GPIO_PORTF_DEN_R |= 0x14;
 	GPIO_PORTF_PUR_R |= 0x10;
 	GPIO_PORTF_DATA_R |= 0x04; //Have blue LED start initially
-	
-	
-	
 
   EnableInterrupts();           // enable interrupts for the grader
   while(1){
-    // body goes here
+
+		if (PF4 == 0) {
+			PF2 = ~PF2;
+		}
+		if (PF4 == 1) {
+			PF2 = 1;
+		}
   }
 }
+
+
