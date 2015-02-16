@@ -73,11 +73,11 @@ int main(void){ unsigned long volatile delay;
   EnableInterrupts();           // enable interrupts for the grader
   while(1){
 		Delay100ms(1);
-		if (PF4 == 0) {
+		if (PF4 == 0x00) {
 			PF2 = ~PF2;
 		}
-		if (PF4 == 1) {
-			PF2 = 1;
+		if (PF4 == 0x10) {
+			PF2 = 0x04;
 		}
   }
 }
