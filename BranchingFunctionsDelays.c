@@ -49,14 +49,19 @@ void Delay100ms(unsigned long time){
 }
 
 int main(void){ unsigned long volatile delay;
+	unsigned int i; //Used for clock delay.
+	
   TExaS_Init(SW_PIN_PF4, LED_PIN_PF2);  // activate grader and set system clock to 80 MHz
   // initialization goes here
 
 	//Port F setup
 	SYSCTL_RCGC2_R |= 0x00000020;     // activate clock for Port F
-	//Delay 100ms -> Must come right after clock activation
-	Delay100ms(1);
-
+	//Delay only 4 clock cycles
+	i = 4;
+	while(i > 0) {
+		i = i - 1;
+	}
+	
 	GPIO_PORTF_AMSEL_R &= ~0x14;
 	GPIO_PORTF_PCTL_R &= ~0x14;
 	GPIO_PORTF_DIR_R = (GPIO_PORTF_DIR_R&(~0x10))|0x04;
@@ -67,7 +72,7 @@ int main(void){ unsigned long volatile delay;
 
   EnableInterrupts();           // enable interrupts for the grader
   while(1){
-
+		Delay100ms(1);
 		if (PF4 == 0) {
 			PF2 = ~PF2;
 		}
