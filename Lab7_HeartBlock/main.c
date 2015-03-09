@@ -35,6 +35,15 @@
 #define GPIO_PORTF_AMSEL_R      (*((volatile unsigned long *)0x40025528))
 #define GPIO_PORTF_PCTL_R       (*((volatile unsigned long *)0x4002552C))
 #define SYSCTL_RCGC2_R          (*((volatile unsigned long *)0x400FE108))
+	
+	// Port F Address: 0x40025000
+// Set bit-specific addresses for PF0-PF4
+#define PF0											(*((volatile unsigned long *)0x40025004))
+#define PF1											(*((volatile unsigned long *)0x40025008))
+#define PF2											(*((volatile unsigned long *)0x40025010))
+#define PF3											(*((volatile unsigned long *)0x40025020))
+#define PF4											(*((volatile unsigned long *)0x40025040))
+	
 // 2. Declarations Section
 //   Global Variables
 
@@ -65,6 +74,15 @@ int main(void){
     // g) VT signal goes high
     // h) wait 250ms
     // i) VT signal goes low
+
+		
+		
+		if (PF4 == 0x00) {
+			SetReady();
+		}
+		if (PF4 == 0x10) {
+			ClearReady();
+		}
   }
 }
 // Subroutine to initialize port F pins for input and output
@@ -82,6 +100,9 @@ void PortF_Init(void){ volatile unsigned long delay;
   GPIO_PORTF_AFSEL_R &= 0x00;        // 5) no alternate function
   GPIO_PORTF_PUR_R |= 0x10;          // 6) enable pullup resistor on PF4       
   GPIO_PORTF_DEN_R |= 0x1E;          // 7) enable digital pins PF4-PF1
+	
+	//GPIO_PORTF_DATA_R |= 0x04; //Have blue LED start
+	GPIO_PORTF_DATA_R &= 0x00; //Start with LED dark.
 }
 // Color    LED(s) PortF
 // dark     ---    0
@@ -132,7 +153,8 @@ void ClearVT(void){
 // Outputs: None
 // Notes:   friendly means it does not affect other bits in the port
 void SetReady(void){
-// write this function
+// Set Ready - PF3 (Green LED) On (1)
+	GPIO_PORTF_DATA_R |= 0x08;
 }
 
 
@@ -141,7 +163,8 @@ void SetReady(void){
 // Outputs: None
 // Notes:   friendly means it does not affect other bits in the port
 void ClearReady(void){
-// write this function
+// Cears Ready - PF3 (Green LED) Off (0)
+	GPIO_PORTF_DATA_R &= ~0x08;
 }
 
 // Subroutine to delay in units of milliseconds
@@ -149,7 +172,13 @@ void ClearReady(void){
 // Outputs: None
 // Notes:   assumes 80 MHz clock
 void Delay1ms(unsigned long msec){
-// write this function
-
+  double i;
+  while(msec > 0){
+    i = 13333.33;  // should finish in 1ms. 1333333 takes 100ms to complete.
+    while(i > 0){
+      i = i - 1;
+    }
+    msec = msec - 1; // decrements every 1 ms
+  }
 }
 
