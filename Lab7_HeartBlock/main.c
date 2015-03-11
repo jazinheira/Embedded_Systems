@@ -58,6 +58,8 @@ void ClearVT(void);
 void SetReady(void);
 void ClearReady(void);
 
+
+
 // 3. Subroutines Section
 // MAIN: Mandatory for a C Program to be executable
 int main(void){
@@ -75,14 +77,33 @@ int main(void){
     // h) wait 250ms
     // i) VT signal goes low
 
+			//a)
+		SetReady();
 		
+		//b)
+		WaitForASLow();
 		
-		if (PF4 == 0x00) {
-			SetReady();
-		}
-		if (PF4 == 0x10) {
-			ClearReady();
-		}
+		//c)
+		ClearReady();
+		
+		//d)
+		Delay1ms(10);
+		
+		//e)
+		WaitForASHigh();
+		
+		//f
+		Delay1ms(250);
+		
+		//g
+		SetVT();
+		
+		//h
+		Delay1ms(250);
+		
+		//i
+		ClearVT();
+		
   }
 }
 // Subroutine to initialize port F pins for input and output
@@ -120,7 +141,14 @@ void PortF_Init(void){ volatile unsigned long delay;
 // Inputs:  None
 // Outputs: None
 void WaitForASLow(void){
-// write this function
+// Wait for AS (PF4 - SW1) to be 0 [Switch pressed]
+	int j = 0;
+	while (j < 1) {
+		if (PF4 == 0x00)
+		{
+			j = 1;
+		}
+	}
 }
 
 // Subroutine reads AS input and waits for signal to be low
@@ -129,7 +157,14 @@ void WaitForASLow(void){
 // Inputs:  None
 // Outputs: None
 void WaitForASHigh(void){
-// write this function
+// Wait for AS (PF4 - SW1) to be 1 [Switch released]
+	int j = 0;
+	while (j < 1) {
+		if (PF4 == 0x10)
+		{
+			j = 1;
+		}
+	}
 }
 
 // Subroutine sets VT high
@@ -137,7 +172,8 @@ void WaitForASHigh(void){
 // Outputs: None
 // Notes:   friendly means it does not affect other bits in the port
 void SetVT(void){
-// write this function
+// Set VT - PF1 (Red LED) On (1)
+	GPIO_PORTF_DATA_R |= 0x02;
 }
 
 // Subroutine clears VT low
@@ -145,7 +181,8 @@ void SetVT(void){
 // Outputs: None
 // Notes:   friendly means it does not affect other bits in the port
 void ClearVT(void){
-// write this function
+// Clear VT - PF1 (Red LED) Off (0)
+	GPIO_PORTF_DATA_R &= ~0x02;
 }
 
 // Subroutine sets Ready high
@@ -172,9 +209,8 @@ void ClearReady(void){
 // Outputs: None
 // Notes:   assumes 80 MHz clock
 void Delay1ms(unsigned long msec){
-  double i;
   while(msec > 0){
-    i = 13333.33;  // should finish in 1ms. 1333333 takes 100ms to complete.
+    unsigned long i = 13333.33;  // should finish in 1ms. 1333333 takes 100ms to complete.
     while(i > 0){
       i = i - 1;
     }
